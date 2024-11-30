@@ -6,7 +6,7 @@ exec_time={'Mongo':{'1.1':0,'1.2':0,'2.1':0,'2.2':0},
 
 def get_drop_columns():
     shots_drop_columns=["Minute","Squad","xG","PSxG","Notes","SCA 1_Player","SCA 1_Event","SCA 2_Player","SCA 2_Event"]
-    matches_drop_columns=['Unnamed: 1', 'Referee', 'Notes', 'played']
+    matches_drop_columns=['Unnamed: 1', 'Referee', 'Notes', 'played','id']
     players_drop_columns=["Per 90 Minutes_G-PK", "Per 90 Minutes_G+A-PK", "Per 90 Minutes_xG",
                         "Per 90 Minutes_xAG", "Per 90 Minutes_xG+xAG", "Per 90 Minutes_npxG",
                         "Per 90 Minutes_npxG+xAG",'Playing Time_MP', 'Playing Time_Starts', 

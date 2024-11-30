@@ -42,6 +42,7 @@ def MySql_connect():
 
     # Loop through each CSV file
     for df, csv_file in zip(df_list, csv_files):
+        print('-------',df.columns)
         # Handle missing data (NaNs), replace with None (NULL for MySQL)
         df = df.where(pd.notnull(df), None)
 
@@ -49,8 +50,8 @@ def MySql_connect():
         df.columns = [col if not col.startswith("Unnamed") else f"Unnamed_{i}" for i, col in enumerate(df.columns)]
 
         # Ensure that 'id' column does not conflict with any CSV column
-        if 'id' in df.columns:
-            df = df.drop(columns=['id'])  # Drop the 'id' column from CSV if it exists
+        # if 'id' in df.columns:
+        #     df = df.drop(columns=['id'])  # Drop the 'id' column from CSV if it exists
 
         # Convert DataFrame to a list of dictionaries (records)
         try:
@@ -84,7 +85,7 @@ def MySql_connect():
                 column_defs.append(f"{escaped_col} VARCHAR(255)")
 
         # Add 'id' column as primary key
-        column_defs.insert(0, "id INT AUTO_INCREMENT PRIMARY KEY")
+        column_defs.insert(0, "ID_Index INT AUTO_INCREMENT PRIMARY KEY")
 
         # Create table SQL query
         create_table_query = f"""
