@@ -3,6 +3,58 @@ import pandas as pd
 import numpy as np
 from DFStruct import *
 
+
+# Function to map pandas dtypes to MySQL dtypes
+def map_dtype_to_mysql(dtype):
+    if np.issubdtype(dtype, np.integer):
+        return "INT"
+    elif np.issubdtype(dtype, np.floating):
+        return "FLOAT"
+    elif np.issubdtype(dtype, np.datetime64):
+        return "DATETIME"
+    elif np.issubdtype(dtype, np.object_):
+        return "VARCHAR(255)"  # Default string length, can be adjusted based on data
+    else:
+        return "VARCHAR(255)"  # Fallback for unknown types
+
+
+def generate_create_table_statement(df, table_name):
+    columns = df.columns
+    column_defs = []
+
+    # Iterate through each column and generate its definition
+    for col in columns:
+        dtype = df[col].dtype
+        mysql_type = map_dtype_to_mysql(dtype)
+        
+        # Escape column names that might be reserved keywords or contain special characters
+        escaped_col = f"`{col}`"  # Using backticks around column names
+        
+        column_defs.append(f"{escaped_col} {mysql_type}")
+    
+    # Add an auto-incremented primary key 'ID_Index' column at the beginning
+    column_defs.insert(0, "ID_Index INT AUTO_INCREMENT PRIMARY KEY")
+
+    # Create the SQL statement
+    create_table_statement = f"""
+    CREATE TABLE IF NOT EXISTS {table_name} (
+        {', '.join(column_defs)}
+    );
+    """
+    
+    return create_table_statement
+
+def MySql_table_statements():    
+    df_list=[pd.read_csv(df) for df in csv_files]
+    table_names=[csv_file.split("/")[-1].split(".")[0] for csv_file in csv_files]
+    result=[]
+
+    for df,table_name in zip(df_list,table_names):
+        result.append(generate_create_table_statement(df, table_name))
+
+    return result
+
+
 # Function to escape column names that might be reserved keywords or contain special characters
 def escape_column_name(col_name):
     # MySQL reserved keywords should be wrapped in backticks
@@ -27,14 +79,7 @@ def MySql_connect():
     cursor.execute(f"USE {database_name}")
 
     # List of CSV files to process
-    csv_files = [
-        "data/shots.csv",
-        "data/matches.csv",
-        "data/all_players.csv",
-        "data/teams.csv"
-        # Add other CSV filenames here
-    ]  # Replace with actual file paths
-
+    
     shots_drop_columns,matches_drop_columns,players_drop_columns,teams_drop_columns=get_drop_columns()
     df_shots,df_matches,df_players,df_teams=read_all_csvs(shots_drop_columns,matches_drop_columns,players_drop_columns,teams_drop_columns)
 
@@ -42,7 +87,6 @@ def MySql_connect():
 
     # Loop through each CSV file
     for df, csv_file in zip(df_list, csv_files):
-        print('-------',df.columns)
         # Handle missing data (NaNs), replace with None (NULL for MySQL)
         df = df.where(pd.notnull(df), None)
 
@@ -124,4 +168,6 @@ def MySql_connect():
     # connection.close()
     
     return cursor,connection,df_shots,df_matches,df_players,df_teams
+
+
 

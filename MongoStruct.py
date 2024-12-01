@@ -1,7 +1,63 @@
 import pandas as pd
 from pymongo import MongoClient
-import ast
 from DFStruct import *
+from bson import SON
+import numpy as np
+
+# Connect to MongoDB locally
+client = MongoClient("mongodb://localhost:27017")
+# Connect to MongoDB atlas
+#client = MongoClient("mongodb+srv://<username>:<password>@<cluster-url>/") # YOU SHOULD CHANGE TO YOUR CREDENTIALS AND SERVER INFO, just copy the ones from mongo atlas connect
+client.drop_database("DB_football")
+print("Database dropped")
+db = client['DB_football'] 
+
+# get cloumns to drop
+shots_drop_columns,matches_drop_columns,players_drop_columns,teams_drop_columns=get_drop_columns()
+# create df from csvs
+df_shots,df_matches,df_players,df_teams=read_all_csvs(shots_drop_columns,matches_drop_columns,players_drop_columns,teams_drop_columns)
+
+# Function to map pandas dtypes to MongoDB types
+def map_dtype_to_mongo(dtype):
+    if np.issubdtype(dtype, np.integer):
+        return "int"
+    elif np.issubdtype(dtype, np.floating):
+        return "double"
+    elif np.issubdtype(dtype, np.datetime64):
+        return "date"
+    elif np.issubdtype(dtype, np.object_):
+        return "string"
+    else:
+        return "string"  # Default fallback
+
+def generate_mongo_schema(df, collection_name):
+    columns = df.columns
+    schema_lines = []
+
+    # Add the start of the MongoDB schema definition
+    create_collection_statement = f"MongoDB Collection: {collection_name} Schema"
+
+    # Iterate through each column and generate its definition
+    for col in columns:
+        dtype = df[col].dtype
+        mongo_type = map_dtype_to_mongo(dtype)
+        schema_lines.append(f"    {col}: {mongo_type}")
+
+    # Join the column definitions and display the schema
+    create_collection_statement += "\n" + "\n".join(schema_lines)
+
+    return create_collection_statement
+
+def Mongo_table_statements():    
+    df_list=[df_shots,df_matches,df_players,df_teams]
+    table_names=[csv_file.split("/")[-1].split(".")[0] for csv_file in csv_files]
+    result=[]
+
+    for df,table_name in zip(df_list,table_names):
+        result.append(generate_mongo_schema(df, table_name))
+
+    return result
+
 
 # Connect MongoDB create/recreate DB,tables
 def Mongo_connect(*args):
@@ -11,16 +67,7 @@ def Mongo_connect(*args):
     df_players=args[2]
     df_teams=args[3]
 
-    # Connect to MongoDB locally
-    client = MongoClient("mongodb://localhost:27017")
-
-    # Connect to MongoDB atlas
-    #client = MongoClient("mongodb+srv://<username>:<password>@<cluster-url>/") # YOU SHOULD CHANGE TO YOUR CREDENTIALS AND SERVER INFO, just copy the ones from mongo atlas connect
-
-    client.drop_database("DB_football")
-    print("Database dropped")
-
-    db = client['DB_football'] 
+    
     # Drop previous tables
     db['shots'].drop()
     db['matches'].drop()
@@ -126,10 +173,6 @@ def handle_all_tables(*args):
 
 # get client,collections and csvs
 def get_all_data():    
-    # get cloumns to drop
-    shots_drop_columns,matches_drop_columns,players_drop_columns,teams_drop_columns=get_drop_columns()
-    # create df from csvs
-    df_shots,df_matches,df_players,df_teams=read_all_csvs(shots_drop_columns,matches_drop_columns,players_drop_columns,teams_drop_columns)
     # create collection from dfs
     client,shots_collection,matches_collection,players_collection,teams_collection=Mongo_connect(df_shots,df_matches,df_players,df_teams)
     # drop columns in collections
