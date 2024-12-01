@@ -1,4 +1,4 @@
-# Data Base Projects
+# Football analytics with MongoDB, MySQL, and Python.
 
 ## Get DataSet from
 
