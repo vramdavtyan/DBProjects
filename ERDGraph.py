@@ -38,18 +38,7 @@ def plot_goals_bar_chart(df):
 
 
 
-
-def find_references(collection_name, df):
-    references = []
-    # Check for fields that contain references to other collections
-    for column in df.columns:
-        if '_id' in column:  # This is a simplistic way to find references
-            referenced_collection = column.replace('_id', '')  # e.g., 'team_id' -> 'team'
-            references.append(referenced_collection)
-    return references
-
-# Function to generate ERD from MongoDB collections and their references
-def generate_mongo_erd(collections_info):
+def generate_mongo_erd(collections_info, dpi=300):
     dot = Digraph(comment='MongoDB ERD', engine='dot')
 
     # Set graph background to dark blue and node box color to blue
@@ -58,7 +47,7 @@ def generate_mongo_erd(collections_info):
     dot.attr('edge', color='#FFFFFF', fontcolor='#FFFFFF')  # White cardinality labels
 
     # Set DPI for PNG rendering (300 DPI)
-    dot.attr(dpi='300')
+    dot.attr(dpi=str(dpi))
 
     # Iterate over the collections and add them to the ERD as nodes
     for collection_name, df in collections_info.items():
@@ -79,14 +68,25 @@ def generate_mongo_erd(collections_info):
             # Cardinality representation (adjust based on your logic)
             cardinality = '1..*'  # Default cardinality, you can change this depending on your data model
             if 'team' in ref_collection:
-                cardinality = '1..*'  # Example: one team can have many shots
+                cardinality = '1..*'  # One team can have many shots
+                arrow_style = 'forked'  # One to many (forked)
             elif 'player' in ref_collection:
-                cardinality = '*..1'  # Example: one player can have many matches, but each match has one player
-            
+                cardinality = '1..1'  # One player is linked to exactly one match (one to one)
+                arrow_style = '->'  # One to one (single directed arrow)
+            else:
+                cardinality = '*..*'  # Many to many relationship
+                arrow_style = '--'  # Many to many (undirected)
+
             # Add edge with cardinality label, set direction and arrow style
-            dot.edge(collection_name, ref_collection, label=f"{cardinality}", dir='both', arrowhead='vee', arrowtail='vee')
+            dot.edge(collection_name, ref_collection, label=f"{cardinality}", dir='both', arrowhead=arrow_style, arrowtail=arrow_style, len='2.5')
 
     return dot
 
-
-
+# Helper function to identify references
+def find_references(collection_name, df):
+    references = []
+    for column in df.columns:
+        # Example logic for detecting references based on column name conventions
+        if '_' in column:
+            references.append(column)
+    return references
