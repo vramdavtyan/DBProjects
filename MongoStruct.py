@@ -1,5 +1,5 @@
 import pandas as pd
-from pymongo import MongoClient
+from pymongo import MongoClient, ASCENDING, DESCENDING
 from DFStruct import *
 from bson import SON
 import numpy as np
@@ -59,14 +59,13 @@ def Mongo_table_statements():
     return result
 
 
+
 # Connect MongoDB create/recreate DB,tables
 def Mongo_connect(*args):
-    
     df_shots=args[0]
     df_matches=args[1]
     df_players=args[2]
     df_teams=args[3]
-
     
     # Drop previous tables
     db['shots'].drop()

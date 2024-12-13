@@ -1,0 +1,49 @@
+// MongoDB ERD
+digraph {
+	bgcolor="#001f3d" color="#FFFFFF"
+	node [fillcolor="#007acc" fontcolor="#000000" fontname=Helvetica fontsize=16 shape=box style=filled width=1.2]
+	edge [color="#FFFFFF" fontcolor="#FFFFFF"]
+	dpi=300
+	shots [label="___shots___
+Player
+Outcome
+Distance
+Body Part
+match_id"]
+	matches [label="___matches___
+Date
+league
+Round
+Day
+Attendance
+home_id
+away_id
+score_away
+score_home"]
+	players [label="___players___
+id
+Pos
+Matches
+club_id
+MP
+year
+name"]
+	teams [label="___teams___
+id
+name
+league
+W
+D
+L
+MP
+GF
+GA
+GD
+Pts"]
+	shots -> match [label="*..*" arrowhead="--" arrowtail="--" dir=both len=2.5]
+	matches -> home [label="*..*" arrowhead="--" arrowtail="--" dir=both len=2.5]
+	matches -> away [label="*..*" arrowhead="--" arrowtail="--" dir=both len=2.5]
+	matches -> score [label="*..*" arrowhead="--" arrowtail="--" dir=both len=2.5]
+	matches -> score [label="*..*" arrowhead="--" arrowtail="--" dir=both len=2.5]
+	players -> club [label="*..*" arrowhead="--" arrowtail="--" dir=both len=2.5]
+}
