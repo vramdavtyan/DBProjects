@@ -1,6 +1,9 @@
 from graphviz import Digraph
 import matplotlib.pyplot as plt
-plt.style.use('dark_background')
+
+plt.style.use('ggplot')
+plt.grid(linestyle='--') 
+# plt.style.use('dark_background')
 
 def plot_goals_bar_chart(df):
     # Set up the figure and axis for the bar chart
@@ -10,10 +13,14 @@ def plot_goals_bar_chart(df):
     x_pos = range(len(df))
 
     # Plotting the bars for each category (total_goals, gt_16, lt_16)
-    bars_total_goals = ax.bar(x_pos, df['total_goals'], width=0.25, label='Total Goals', align='center', color='blue')
-    ax.bar([p + 0.25 for p in x_pos], df['gt_16'], width=0.25, label='Goals > 16m', align='center', color='orange')
-    ax.bar([p - 0.25 for p in x_pos], df['lt_16'], width=0.25, label='Goals <= 16m', align='center', color='green')
+    bars_total_goals = ax.bar(x_pos, df['total_goals'], width=0.25, label='Total Goals', align='center')
+    ax.bar([p + 0.25 for p in x_pos], df['gt_16'], width=0.25, label='Goals > 16m', align='center')
+    ax.bar([p - 0.25 for p in x_pos], df['lt_16'], width=0.25, label='Goals <= 16m', align='center')
 
+
+    for rect in ax.patches:
+        rect.set_width(0.5) 
+    
     # Add labels and title
     ax.set_xlabel('Players', fontsize=14)
     ax.set_ylabel('Number of Goals', fontsize=14)
@@ -22,6 +29,8 @@ def plot_goals_bar_chart(df):
     # Set the x-ticks with player names
     ax.set_xticks(x_pos)
     ax.set_xticklabels(df['Name'], rotation=45, ha='right', fontsize=12)
+    ax.grid(True,color='black', linestyle='--', linewidth=1,alpha=0.2)
+
 
     # Add a legend to distinguish between the bars
     ax.legend()
@@ -30,7 +39,7 @@ def plot_goals_bar_chart(df):
     for bar in bars_total_goals:
         yval = bar.get_height()  # Get the height of the bar (which is the value)
         ax.text(bar.get_x() + bar.get_width() / 2, yval + 0.2,  # Position the text slightly above the bar
-                f'{int(yval)}', ha='center', va='bottom', fontsize=12, color='white')
+                f'{int(yval)}', ha='center', va='bottom', fontsize=12)
 
     # Display the plot
     plt.tight_layout()  # To make sure everything fits without overlap

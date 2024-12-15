@@ -1,6 +1,8 @@
 import pandas as pd
 import time
 import pprint
+import itertools
+
 
 
 
@@ -16,6 +18,21 @@ csv_files = [
 
 exec_time={'Mongo':{'1.1':0,'1.2':0,'2.1':0,'2.2':0},
            'MySql':{'1.1':0,'1.2':0,'2.1':0,'2.2':0}}
+
+
+def get_dict_combinations(dct):
+    combinations = []
+    # Loop over all possible combination lengths
+    for r in range(1, len(dct) + 1):
+        # Generate all combinations of key-value pairs of length r
+        key_value_combos = itertools.combinations(dct.items(), r)
+        combinations.extend(key_value_combos)
+    
+    # Convert each combination (tuple of key-value pairs) back into a dictionary
+    return [dict(comb) for comb in combinations]
+
+
+
 
 def get_drop_columns():
     shots_drop_columns=["Minute","Squad","xG","PSxG","Notes","SCA 1_Player","SCA 1_Event","SCA 2_Player","SCA 2_Event"]

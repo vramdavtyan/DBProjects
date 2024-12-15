@@ -1,29 +1,46 @@
 # Football analytics with MongoDB, MySQL, and Python.
 
-## Get DataSet from
+---
 
-```
-https://www.kaggle.com/datasets/moradi/football-statistics?select=shots.csv
-```
+## Setup Instructions
 
-## After Cloning the Repo Create a directory named data
+1. **Clone the Repository**  
+   Clone the repository to your local machine.
 
-## Put all the csvs from Kaggle inside it
+2. **Create a Data Directory**  
+   Inside the `DBProjects` folder, create a new directory called `data`.
 
-## Create Virtual Environment with Python (Windows)
+3. **Add the CSV Files**  
+   Download the CSV files from Kaggle and place them inside the `data` directory.
+   https://www.kaggle.com/datasets/moradi/football-statistics?select=shots.csv
 
-```
-py -3.10 -m venv venv
-```
+4. **Create a Virtual Environment (Windows)**  
+   Set up a Python virtual environment to manage project dependencies. You can do this by running the following commands in your terminal:
 
-## Activate Venv
+   ```bash
+   python -m venv venv
+   ```
 
-```
-venv\Scripts\activate.bat
-```
+   Once the environment is created, activate it with:
 
-## Pip Install Packages from requirements.txt
+   ```bash
+   .\venv\Scripts\activate
+   ```
 
-```
-pip install -r requirements.txt
-```
+5. **Install Required Packages**  
+   Install the required Python packages using the `requirements.txt` file:
+
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+---
+
+## How to Run the Project
+
+### To get started, simply execute the following Jupyter notebooks:
+
+- **MongoQueries.ipynb**
+- **MySqlQueries.ipynb**
+
+The Python scripts contain functions that handle database management, DataFrame operations, and other utility functions used throughout the project.

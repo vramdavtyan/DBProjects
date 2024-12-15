@@ -179,4 +179,3 @@ def get_all_data():
 
     return client,shots_collection,matches_collection,players_collection,teams_collection,df_shots,df_matches,df_players,df_teams
 
-
